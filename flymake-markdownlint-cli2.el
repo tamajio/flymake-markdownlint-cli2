@@ -125,13 +125,12 @@
                       ;; locations, collect them in a list of objects, and call `report-fn'.
                       (cl-loop
                        while (search-forward-regexp
-                              "^\\(stdin\\):\\([0-9]+\\):?[0-9]* \\([A-Z]+[0-9]+/.*\\)$"
+                              "^\\(stdin\\):\\([0-9]+\\):?[0-9]* \\(warning\\|error\\) \\([A-Z]+[0-9]+/.*\\)$"
                               nil t)
 
-                       for msg = (match-string 3)
+                       for msg = (match-string 4)
                        for (beg . end) = (flymake-diag-region source (string-to-number (match-string 2)))
-                       ;; for type = (if (string-match "^warning" msg) :warning :error)
-                       for type = :warning
+                       for type = (if (string-match "warning" (match-string 3)) :warning :error)
                        when (and beg end)
                        collect (flymake-make-diagnostic source beg end type msg)
                        into diags
